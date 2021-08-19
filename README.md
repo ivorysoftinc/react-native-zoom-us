@@ -5,7 +5,7 @@ This is a bridge for ZoomUS SDK:
 
 | Platform      | Version           | Url                                      | Changelog                                                            |
 | :-----------: | :---------------: | :--------------------------------------: | :------------------------------------------------------------------: |
-| iOS	        | 5.5.12511.0421    | https://github.com/zoom/zoom-sdk-ios     | https://marketplace.zoom.us/docs/changelog#labels/client-sdk-i-os    |
+| iOS	          | 5.4.54802.0124    | https://github.com/zoom/zoom-sdk-ios     | https://marketplace.zoom.us/docs/changelog#labels/client-sdk-i-os    |
 | Android       | 5.0.24433.0616    | https://github.com/zoom/zoom-sdk-android | https://marketplace.zoom.us/docs/changelog#labels/client-sdk-android |
 
 Tested on XCode 12.4 and react-native 0.64.0. ([See details](https://github.com/mieszko4/react-native-zoom-us#testing))
@@ -47,19 +47,6 @@ buildscript {
 
 See [diff](https://github.com/mieszko4/react-native-zoom-us-test/pull/10/commits/cabdb876cc40f78f0a6d977d38377497be5e0726) for reference.
 
-3. Optional: Add custom activity config (`android/app/src/main/res/values/config.xml`)
-
-  > If you have custom conference activity, instead official activity or custom UI.
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="zm_config_conf_activity">ID of your custom activity</string>
-</resources>
-```
-
-See [docs](https://marketplace.zoom.us/docs/sdk/native-sdks/android/mastering-zoom-sdk/in-meeting-function/customized-meeting-ui/overview) for more details.
-
 #### iOS
 1. Make sure you have appropriate description in `Info.plist`:
 ```xml
@@ -79,9 +66,6 @@ See [docs](https://marketplace.zoom.us/docs/sdk/native-sdks/android/mastering-zo
 2. Update pods using `cd ios/ && pod install && cd ..`
 
 3. Make sure to set `ENABLE_BITCODE = NO;` for both Debug and Release because bitcode is not supported by Zoom iOS SDK 
-
-4. Optional: Implement custom UI
-See [docs](https://marketplace.zoom.us/docs/sdk/native-sdks/iOS/mastering-zoom-sdk/in-meeting-function/customized-in-meeting-ui/overview) for more details.
 
 ## Usage
 ```typescript
@@ -104,8 +88,7 @@ await ZoomUs.initialize({
   clientSecret: '...',
   domain: 'zoom.us'
 }, {
-  disableShowVideoPreviewWhenJoinMeeting: true,
-  enableCustomizedMeetingUI: true
+  disableShowVideoPreviewWhenJoinMeeting: true
 })
 
 
@@ -147,7 +130,6 @@ await ZoomUs.connectAudio()
 
 - [Screenshare on iOS](https://github.com/mieszko4/react-native-zoom-us/tree/master/docs/IOS-SCREENSHARE.md)
 - [Events](https://github.com/mieszko4/react-native-zoom-us/tree/master/docs/EVENTS.md)
-- [Video View Component](docs/VIDEO-VIEW.md)
 
 
 ## Testing

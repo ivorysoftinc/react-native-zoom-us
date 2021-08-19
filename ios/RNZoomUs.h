@@ -10,5 +10,8 @@
 
 @interface RNZoomUs : RCTEventEmitter<RCTBridgeModule, MobileRTCAuthDelegate, MobileRTCMeetingServiceDelegate>
 
+@property (nonatomic, strong) UINavigationController *zoomNavController;
+@property (nonatomic, strong) UIView *zoomView;
+
 @end
 

@@ -23,6 +23,6 @@ public class RNZoomUsPackage implements ReactPackage {
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-      return Arrays.<ViewManager>asList(new RNZoomUsVideoViewManager());
+      return Collections.emptyList();
     }
 }
