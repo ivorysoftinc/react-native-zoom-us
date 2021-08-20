@@ -63,34 +63,11 @@ RCT_EXPORT_METHOD(
 
     screenShareExtension = data[@"iosScreenShareExtensionId"];
     jwtToken = data[@"jwtToken"];
-      
-      NSDictionary *frame = [data objectForKey:@"frame"];
-      
-      NSString *x = [frame objectForKey:@"x"];
-      NSString *y = [frame objectForKey:@"y"];
-      NSString *width = [frame objectForKey:@"width"];
-      NSString *height = [frame objectForKey:@"height"];
-    
-                         
-      UIViewController *rootVC = [[[UIApplication sharedApplication] keyWindow] rootViewController];
-      
-      self.zoomView = [[UIView alloc] initWithFrame:CGRectMake([x doubleValue], [y doubleValue], [width doubleValue], [height doubleValue])];
-      [rootVC.view addSubview:self.zoomView];
-      [self.zoomView setNeedsLayout];
-      [self.zoomView layoutIfNeeded];
-      
+
       self.zoomNavController = [[UINavigationController alloc] initWithRootViewController:[UIViewController new]];
     
       [self.zoomNavController setNavigationBarHidden:YES];
       
-      
-    [self.zoomView addSubview:self.zoomNavController.view];
-    [rootVC addChildViewController:self.zoomNavController];
-    [self.zoomNavController didMoveToParentViewController:rootVC];
-
-      self.zoomNavController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
-      self.zoomNavController.view.frame = [self.zoomView bounds];
-
     MobileRTCSDKInitContext *context = [[MobileRTCSDKInitContext alloc] init];
     context.domain = data[@"domain"];
     context.enableLog = YES;
@@ -127,16 +104,74 @@ RCT_EXPORT_METHOD(
   }
 }
 
+RCT_EXPORT_METHOD(
+  joinMeeting: (NSDictionary *)data
+  withResolve: (RCTPromiseResolveBlock)resolve
+  withReject: (RCTPromiseRejectBlock)reject
+)
+{
+  @try {
+    shouldAutoConnectAudio = data[@"autoConnectAudio"];
+    meetingPromiseResolve = resolve;
+    meetingPromiseReject = reject;
+
+    MobileRTCMeetingService *ms = [[MobileRTC sharedRTC] getMeetingService];
+    if (ms) {
+        NSLog(@"%@", data);
+        NSDictionary *frame = [data objectForKey:@"frame"];
+        
+        NSString *x = [frame objectForKey:@"x"];
+        NSString *y = [frame objectForKey:@"y"];
+        NSString *width = [frame objectForKey:@"width"];
+        NSString *height = [frame objectForKey:@"height"];
+      
+                           
+        UIViewController *rootVC = [[[UIApplication sharedApplication] keyWindow] rootViewController];
+        
+        self.zoomView = [[UIView alloc] initWithFrame:CGRectMake([x doubleValue], [y doubleValue], [width doubleValue], [height doubleValue])];
+        [rootVC.view addSubview:self.zoomView];
+        [self.zoomView setNeedsLayout];
+        [self.zoomView layoutIfNeeded];
+        
+        [rootVC addChildViewController:self.zoomNavController];
+        [self.zoomNavController didMoveToParentViewController:rootVC];
+
+        self.zoomNavController.view.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+        self.zoomNavController.view.frame = [self.zoomView bounds];
+        [self.zoomView addSubview:self.zoomNavController.view];
+        
+      ms.delegate = self;
+        
+        NSLog(@"DAAAAAAAATA %@", data);
+
+      MobileRTCMeetingJoinParam * joinParam = [[MobileRTCMeetingJoinParam alloc]init];
+      joinParam.userName = data[@"userName"];
+      joinParam.meetingNumber = data[@"meetingNumber"];
+      joinParam.password =  data[@"password"];
+      joinParam.participantID = data[@"participantID"];
+      joinParam.zak = data[@"zoomAccessToken"];
+      joinParam.webinarToken =  data[@"webinarToken"];
+      joinParam.noAudio = data[@"noAudio"];
+      joinParam.noVideo = data[@"noVideo"];
+
+      MobileRTCMeetError joinMeetingResult = [ms joinMeetingWithJoinParam:joinParam];
+
+      NSLog(@"joinMeeting, joinMeetingResult=%d", joinMeetingResult);
+    }
+  } @catch (NSError *ex) {
+      reject(@"ERR_UNEXPECTED_EXCEPTION", @"Executing joinMeeting", ex);
+  }
+}
+
+
 RCT_EXPORT_METHOD(dismissZoom: (RCTPromiseResolveBlock)resolve
                   withReject: (RCTPromiseRejectBlock)reject) {
-    NSLog(@"on dismiss");
 //    viewContoller.willMove(toParent: nil)
 //                viewContoller.view.removeFromSuperview()
 //                viewContoller.removeFromParent()
-    [self.zoomNavController willMoveToParentViewController:nil];
-    [self.zoomNavController.view removeFromSuperview];
-    [self.zoomNavController removeFromParentViewController];
-    self.zoomNavController = nil;
+    
+    MobileRTCMeetingService *ms = [[MobileRTC sharedRTC] getMeetingService];
+    if (ms) [ms leaveMeetingWithCmd:LeaveMeetingCmd_Leave];
 
     [self.zoomView removeFromSuperview];
 }
@@ -170,41 +205,6 @@ RCT_EXPORT_METHOD(
   }
 }
 
-RCT_EXPORT_METHOD(
-  joinMeeting: (NSDictionary *)data
-  withResolve: (RCTPromiseResolveBlock)resolve
-  withReject: (RCTPromiseRejectBlock)reject
-)
-{
-  @try {
-    shouldAutoConnectAudio = data[@"autoConnectAudio"];
-    meetingPromiseResolve = resolve;
-    meetingPromiseReject = reject;
-
-    MobileRTCMeetingService *ms = [[MobileRTC sharedRTC] getMeetingService];
-    if (ms) {
-      ms.delegate = self;
-        
-        NSLog(@"DAAAAAAAATA %@", data);
-
-      MobileRTCMeetingJoinParam * joinParam = [[MobileRTCMeetingJoinParam alloc]init];
-      joinParam.userName = data[@"userName"];
-      joinParam.meetingNumber = data[@"meetingNumber"];
-      joinParam.password =  data[@"password"];
-      joinParam.participantID = data[@"participantID"];
-      joinParam.zak = data[@"zoomAccessToken"];
-      joinParam.webinarToken =  data[@"webinarToken"];
-      joinParam.noAudio = data[@"noAudio"];
-      joinParam.noVideo = data[@"noVideo"];
-
-      MobileRTCMeetError joinMeetingResult = [ms joinMeetingWithJoinParam:joinParam];
-
-      NSLog(@"joinMeeting, joinMeetingResult=%d", joinMeetingResult);
-    }
-  } @catch (NSError *ex) {
-      reject(@"ERR_UNEXPECTED_EXCEPTION", @"Executing joinMeeting", ex);
-  }
-}
 
 // todo should be deleted
 RCT_EXPORT_METHOD(

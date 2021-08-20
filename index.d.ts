@@ -7,7 +7,6 @@ interface RNZoomUsInitializeCommonParams {
 export interface RNZoomUsInitializeParams extends RNZoomUsInitializeCommonParams {
     clientKey: string;
     clientSecret: string;
-    frame: {x: number, y: number, width: number, height: number}
 }
 export interface RNZoomUsSDKInitParams extends RNZoomUsInitializeCommonParams {
     jwtToken: string;
@@ -40,6 +39,7 @@ export interface RNZoomUsJoinMeetingParams {
     zoomAccessToken?: string;
     webinarToken?: string;
     zoomView?: any;
+    frame: {x: number, y: number, width: number, height: number}
 }
 declare function joinMeeting(params: RNZoomUsJoinMeetingParams): Promise<any>;
 declare function joinMeetingWithPassword(...params: any[]): Promise<any>;
